@@ -398,6 +398,45 @@ class Augmenter(object):
         return sample
 
 
+class CropAugmenter(object):
+    """Convert ndarrays in sample to Tensors."""
+
+    def __call__(self, sample, keep_original_odds=0.33):
+
+        if np.random.rand() < keep_original_odds:
+            return sample
+
+        image, annots = sample['img'], sample['annot']
+        image = image[:, ::-1, :]
+
+        rows, cols, channels = image.shape
+
+        x1 = annots[:, 0].copy()
+        y1 = annots[:, 1].copy()
+        x2 = annots[:, 2].copy()
+        y2 = annots[:, 3].copy()
+        
+
+        random_offset_x = random.randrange(0, np.min(x1)) # somewhere between beginning of image and beginning of bounding box
+        random_offset_y = random.randrange(0, np.min(y1))
+
+        new_max_x = random.randrange(np.max(x2), cols) 
+        new_max_y = random.randrange(np.max(y2), rows)
+
+        x_tmp = x1.copy()
+
+        annots[:, 0] -= random_offset_x
+        annots[:, 1] -= random_offset_y
+        annots[:, 2] -= random_offset_x
+        annots[:, 3] -= random_offset_y
+
+        transformed_image = image[random_offset_y:new_max_x, random_offset_x:new_max_y,:]
+
+        sample = {'img': transformed_image, 'annot': annots}
+
+        return sample
+
+
 class Normalizer(object):
 
     def __init__(self):
