@@ -9,7 +9,7 @@ from torchvision import transforms
 
 from retinanet import model
 from retinanet.dataloader import CocoDataset, CSVDataset, collater, Resizer, AspectRatioBasedSampler, Augmenter, \
-    Normalizer
+    CropAugmenter, Normalizer
 from torch.utils.data import DataLoader
 
 from retinanet import coco_eval
@@ -41,7 +41,7 @@ def main(args=None):
             raise ValueError('Must provide --coco_path when training on COCO,')
 
         dataset_train = CocoDataset(parser.coco_path, set_name='train2017',
-                                    transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
+                                    transform=transforms.Compose([Normalizer(), Augmenter(), CropAugmenter(), Resizer()]))
         dataset_val = CocoDataset(parser.coco_path, set_name='val2017',
                                   transform=transforms.Compose([Normalizer(), Resizer()]))
 
